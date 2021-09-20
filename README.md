@@ -1,6 +1,6 @@
 # Currey-2021-NGP
 
-Code and figures for NGP greening and tree cover project
+Large contribution of woody plant expansion to recent vegetative greening of the Northern Great Plains ode and figures for NGP greening and tree cover project
 
 Repo is organized by 'Scripts', 'Figures', and 'Data' folders.
 
