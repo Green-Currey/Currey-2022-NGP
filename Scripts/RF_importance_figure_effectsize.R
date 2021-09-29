@@ -99,6 +99,13 @@ var.names2 <- c('agdd' = 'AGDD',
 # TC 2000 ---------------------------------------------------------------------
 
 
+act <- as.numeric(tc$tc00>0)
+pred <- as.numeric(predict(tc.rf))-1
+
+R2 <- 1 - (sum((act-pred)^2)/sum((act-mean(act))^2)); R2 #0.449
+
+
+
 tc.rf.imp <- varImp(tc.rf, type = 1, scale = T)
 tc.rf.imp <- tc.rf.imp %>% mutate(var = row.names(tc.rf.imp)) %>%
         arrange(desc(Overall)) %>%
@@ -221,6 +228,11 @@ tc.rf.imp$Upr[15] <- confint(mod)[2,2]
 
 
 # TC 2019 ---------------------------------------------------------------------
+
+act <- as.numeric(tc2$tc19>0)
+pred <- as.numeric(predict(tc2.rf))-1
+
+R2 <- 1 - (sum((act-pred)^2)/sum((act-mean(act))^2)); R2 #0.382
 
 
 tc2.rf.imp <- varImp(tc2.rf, type = 1, scale = T)
@@ -433,6 +445,11 @@ tc2.rf.imp$Upr[24] <- confint(mod)[2,2]
 
 # TCC ---------------------------------------------------------------------
 
+act <- as.numeric(tcc$tc>0)
+pred <- as.numeric(predict(tcc.rf))-1
+
+R2 <- 1 - (sum((act-pred)^2)/sum((act-mean(act))^2)); R2 #0.309
+
 
 tcc.rf.imp <- varImp(tcc.rf, type = 1, scale = T)
 tcc.rf.imp <- tcc.rf.imp %>% mutate(var = row.names(tcc.rf.imp)) %>%
@@ -615,6 +632,10 @@ tcc.rf.imp$Upr[23] <- confint(mod)[2,2]
 
 # Peak --------------------------------------------------------------------
 
+act <- as.numeric(peak$ndvi>0)
+pred <- as.numeric(predict(ndvi.rf))-1
+
+R2 <- 1 - (sum((act-pred)^2)/sum((act-mean(act))^2)); R2 #0.174
 
 ndvi.rf.imp <- varImp(ndvi.rf, type = 1, scale = T)
 ndvi.rf.imp <- ndvi.rf.imp %>% mutate(var = row.names(ndvi.rf.imp)) %>%
@@ -818,6 +839,11 @@ ndvi.rf.imp$Upr[24] <- confint(mod)[2,2]
 
 
 # Mean --------------------------------------------------------------------
+
+act <- as.numeric(mean$ndvi_m>0)
+pred <- as.numeric(predict(mndvi.rf))-1
+
+R2 <- 1 - (sum((act-pred)^2)/sum((act-mean(act))^2)); R2 #0.507
 
 
 ndvi2.rf.imp <- varImp(mndvi.rf, type = 1, scale = T)
@@ -1025,6 +1051,11 @@ ndvi2.rf.imp$Upr[23] <- confint(mod)[2,2]
 
 
 # LAI ---------------------------------------------------------------------
+
+act <- as.numeric(lai$lai>0)
+pred <- as.numeric(predict(lai.rf))-1
+
+R2 <- 1 - (sum((act-pred)^2)/sum((act-mean(act))^2)); R2 #0.309
 
 
 lai.rf.imp <- varImp(lai.rf, type = 1, scale = T)

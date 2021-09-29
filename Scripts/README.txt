@@ -25,27 +25,23 @@ and S7)
 # NGP MODIS data change over time mann-kendall test for significance ##
 # Creates change rasters
 
-7. Pixel_stats.R
-# Pixel Statistics for NGP, Greening and TC change
-# Calculates changes in shrub vs glassland
- 
-8. Precipitation_variable_creator.R
+7. Precipitation_variable_creator.R
 # Creates all precipitation variables and precipitation CV
 
-9. Predictor_var_500m_aggregation.R
+8. Predictor_var_500m_aggregation.R
 # This script compiles all rasters into the data frame for the NGP random
 forest analysis
 
-10. Response_vars_500m_aggregation.R
+9. Response_vars_500m_aggregation.R
 # Creates the response var tifs for Tree Cover Change and Greening vars.
 
-11. Soils.R
+10. Soils.R
 # Resamples soils data and produces soils tif
 
-12. Temperature_variable_creator.R
+11. Temperature_variable_creator.R
 # Creates all temperature variables except AGDD. See NGP_AGDD_analsis_2.R.
 
-13. WGS_to_LAEA_conversion.R
+12. WGS_to_LAEA_conversion.R
 # Simple script that converts WGS (un)projected rasters to LAEA projected
 rasters.
 
