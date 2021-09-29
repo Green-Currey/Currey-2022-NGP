@@ -51,4 +51,8 @@ rasters.
 
 
 ~~ Scripts run on Hyalite Super Computure ~~
+1. NGP_rf_analysis.R
+# Script that runs all random forest analyses and exports RDS files
 
+
+ 
