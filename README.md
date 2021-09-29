@@ -16,7 +16,8 @@ The figures folder contains both the figures and tables found in the manuscript 
 The figure folder also contains the rasters of all varaiables used in the analysis (.tif)
 
 **Data**
+Large data used for this project can be found on datadryad.org at [this DOI](https://doi.org/10.5061/dryad.z08kprrdj).
 
-
+Other data, includin random forest .rds output files and other misc .csv files can be found in the data folder on this repo.
 
 
