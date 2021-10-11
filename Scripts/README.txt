@@ -46,6 +46,9 @@ forest analysis
 # Simple script that converts WGS (un)projected rasters to LAEA projected
 rasters.
 
+13. Tjostheim_analysis.R
+# Script that calculates the Tjostheim coefficient between each response
+variable.
 
 ~~ Scripts run on Hyalite Super Computure ~~
 1. NGP_rf_analysis.R
