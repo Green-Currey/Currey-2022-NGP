@@ -4,8 +4,9 @@
 source('c:/users/bryce/onedrive/documents/R/startup.R') 
 #z:/GIS_data/Climate/daymet/Monthly
 
-ngp <- readOGR('d:/GIS_data/NGP/Shapefile/ngp_boundary_LCC2P_WWF.shp')
-ngp.wgs <- readOGR('d:/GIS_data/NGP/Shapefile/ngp_boundary_WGS.shp')
+ngp2 <- readOGR(dsn = 'z:/GIS_data/NGP/Shapefile/ngp_boundary_LCC2P_WWF.shp')
+ngp <- readOGR(dsn = 'c:/users/bryce/onedrive/documents/Current Projects/NGP/2019_Veg_change/Data/Shapefile/ngp_boundary_WGS.shp')
+dem <- raster('c:/users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Raster/Predictor_vars_500/WGS/DEM_WGS_500.tif')
 
 
 # # Calculating annual precipiation from daymet monthly data ----------------
@@ -16,12 +17,18 @@ hist <- seq(1980,1999)
 
 for (j in hist) {
   st <- Sys.time()
-  pr.ann <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% crop(ngp) %>% sum %>% mask(ngp)
+  pr.ann <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% crop(ngp2) %>% sum %>% mask(ngp2)
   if (j == 1980) {pr.ann.stack <- pr.ann} else {pr.ann.stack <- stack(pr.ann.stack, pr.ann)}
   print(Sys.time()-st)
 }
 
-mean(pr.ann.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_MAP_80_99.tif', overwrite = T)
+pr.ann.mean <- mean(pr.ann.stack) %>% 
+  projectRaster(dem, method = 'bilinear') %>%
+  resample(dem) %>%
+  mask(ngp)
+
+# mean(pr.ann.stack) %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/MAP_hist_WGS2.tif', overwrite = T)
+pr.ann.mean %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/MAP_hist_WGS.tif', overwrite = T)
 
 
 
@@ -30,7 +37,7 @@ present <- seq(2000,2019)
 
 for (j in present) {
   st <- Sys.time()
-  pr.stack <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% crop(ngp) %>% sum %>% mask(ngp)
+  pr.stack <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% crop(ngp2) %>% sum %>% mask(ngp2)
   if (j == 2000) {
     pr.ann.stack <- pr.stack
     pr.df <- pr.stack %>% as.data.frame(xy = T)
@@ -42,8 +49,12 @@ for (j in present) {
 }
 names(pr.df) <- c('x','y',present)
 
+pr.ann.mean <- mean(pr.ann.stack) %>% 
+  projectRaster(dem, method = 'bilinear') %>%
+  resample(dem) %>%
+  mask(ngp)
 
-mean(pr.ann.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_MAP_00_19.tif', overwrite = T)
+pr.ann.mean %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/MAP_00_19_WGS.tif', overwrite = T)
 # writeRaster(pr.ann.stack, 'c:/users/bryce/Dropbox/GIS_data/NGP/Raster/daymet/Precip/MAP_stack.tif', overwrite = T)
 # write_csv(pr.df, 'c:/users/bryce/onedrive/documents/NGP/2019_Veg_change/Data/NGP_annual_precipiation.csv')
 
@@ -61,9 +72,9 @@ winter <- c(1, 2, 3, 12)
 hist <- seq(1980,1999)
 for (j in hist) {
   st <- Sys.time()
-  prcp.spring <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(spring) %>% crop(ngp) %>% sum %>% mask(ngp)
-  prcp.summer <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(summer) %>% crop(ngp) %>% sum %>% mask(ngp)
-  prcp.winter <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(winter) %>% crop(ngp) %>% sum %>% mask(ngp)
+  prcp.spring <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(spring) %>% crop(ngp2) %>% sum %>% mask(ngp2)
+  prcp.summer <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(summer) %>% crop(ngp2) %>% sum %>% mask(ngp2)
+  prcp.winter <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(winter) %>% crop(ngp2) %>% sum %>% mask(ngp2)
   
   if (j == 1980) {
     prcp.spring.stack <- prcp.spring
@@ -79,10 +90,28 @@ for (j in hist) {
   print(Sys.time()-st)
 }
 
+pr.sp.mean <- mean(prcp.spring.stack) %>% 
+  projectRaster(dem, method = 'bilinear') %>%
+  resample(dem) %>%
+  mask(ngp)
+
+pr.su.mean <- mean(prcp.summer.stack) %>% 
+  projectRaster(dem, method = 'bilinear') %>%
+  resample(dem) %>%
+  mask(ngp)
+
+pr.w.mean <- mean(prcp.winter.stack) %>% 
+  projectRaster(dem, method = 'bilinear') %>%
+  resample(dem) %>%
+  mask(ngp)
+
+
+
+
 # units in mm
-mean(prcp.spring.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_SpringPr_80_99.tif', overwrite = T)
-mean(prcp.summer.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_SummerPr_80_99.tif', overwrite = T)
-mean(prcp.winter.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_WinterPr_80_99.tif', overwrite = T)
+pr.sp.mean %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/SpringPr_hist_WGS.tif', overwrite = T)
+pr.su.mean %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/SummerPr_hist_WGS.tif', overwrite = T)
+pr.w.mean %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/WinterPr_hist_WGS.tif', overwrite = T)
 
 
 
@@ -91,42 +120,45 @@ mean(prcp.winter.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2
 present <- seq(2000,2019)
 for (j in present) {
   st <- Sys.time()
-  prcp.spring <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(spring) %>% crop(ngp) %>% sum %>% mask(ngp)
-  prcp.summer <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(summer) %>% crop(ngp) %>% sum %>% mask(ngp)
-  prcp.winter <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(winter) %>% crop(ngp) %>% sum %>% mask(ngp)
+  prcp.spring <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(spring) %>% crop(ngp2) %>% sum %>% mask(ngp2)
+  prcp.summer <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(summer) %>% crop(ngp2) %>% sum %>% mask(ngp2)
+  prcp.winter <- stack(paste0('daymet_v3_prcp_monttl_',j,'_na.tif')) %>% subset(winter) %>% crop(ngp2) %>% sum %>% mask(ngp2)
   
   if (j == 2000) {
     prcp.spring.stack <- prcp.spring
-    prcp.spring.df <- prcp.spring %>% as.data.frame(xy = T)
     prcp.summer.stack <- prcp.summer
-    prcp.summer.df <- prcp.summer %>% as.data.frame(xy = T)
     prcp.winter.stack <- prcp.winter
-    prcp.winter.df <- prcp.winter %>% as.data.frame(xy = T)
-    
+
   } else {
     prcp.spring.stack <- stack(prcp.spring.stack, prcp.spring)
-    prcp.spring.df <- cbind.data.frame(prcp.spring.df, prcp.spring %>% as.data.frame())
     prcp.summer.stack <- stack(prcp.summer.stack, prcp.summer)
-    prcp.summer.df <- cbind.data.frame(prcp.summer.df, prcp.summer %>% as.data.frame())
     prcp.winter.stack <- stack(prcp.winter.stack, prcp.winter)
-    prcp.winter.df <- cbind.data.frame(prcp.winter.df, prcp.winter %>% as.data.frame())
   }  
   print(Sys.time()-st)
 }
 
 # units in mm
-mean(prcp.spring.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_SpringPr_00_19.tif', overwrite = T)
-mean(prcp.summer.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_SummerPr_00_19.tif', overwrite = T)
-mean(prcp.winter.stack) %>% writeRaster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_WinterPr_00_19.tif', overwrite = T)
+pr.sp.mean <- mean(prcp.spring.stack) %>% 
+  projectRaster(dem, method = 'bilinear') %>%
+  resample(dem) %>%
+  mask(ngp)
 
-# writeRaster(prcp.spring.stack, 'c:/users/bryce/Dropbox/GIS_data/NGP/Raster/daymet/Precip/Pr_Spring_stack.tif', overwrite = T)
-# writeRaster(prcp.summer.stack, 'c:/users/bryce/Dropbox/GIS_data/NGP/Raster/daymet/Precip/Pr_Summer_stack.tif', overwrite = T)
-# writeRaster(prcp.winter.stack, 'c:/users/bryce/Dropbox/GIS_data/NGP/Raster/daymet/Precip/Pr_Winter_stack.tif', overwrite = T)
-# 
-# write_csv(prcp.spring.df, 'c:/users/bryce/onedrive/documents/NGP/2019_Veg_change/Data/NGP_spring_precipiation.csv')
-# write_csv(prcp.summer.df, 'c:/users/bryce/onedrive/documents/NGP/2019_Veg_change/Data/NGP_summer_precipiation.csv')
-# write_csv(prcp.winter.df, 'c:/users/bryce/onedrive/documents/NGP/2019_Veg_change/Data/NGP_winter_precipiation.csv')
+pr.su.mean <- mean(prcp.summer.stack) %>% 
+  projectRaster(dem, method = 'bilinear') %>%
+  resample(dem) %>%
+  mask(ngp)
 
+pr.w.mean <- mean(prcp.winter.stack) %>% 
+  projectRaster(dem, method = 'bilinear') %>%
+  resample(dem) %>%
+  mask(ngp)
+
+
+
+# units in mm
+pr.sp.mean %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/SpringPr_00_19_WGS.tif', overwrite = T)
+pr.su.mean %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/SummerPr_00_19_WGS.tif', overwrite = T)
+pr.w.mean %>% writeRaster('z:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/WinterPr_00_19_WGS.tif', overwrite = T)
 
 
 
@@ -154,54 +186,43 @@ writeRaster(cv, 'c:/users/bryce/Dropbox/NGP_veg_change_2019/Raster/NGP_pr_CV.tif
 
 
 source('c:/users/bryce/onedrive/documents/R/startup.R') 
-#c:/users/bryce/Dropbox/NGP_veg_change_2019/Raster
-
-ngp <- readOGR('d:/GIS_data/NGP/Shapefile/ngp_boundary_LCC2P_WWF.shp')
-ngp.wgs <- readOGR('d:/GIS_data/NGP/Shapefile/ngp_boundary_WGS.shp')
+#z:/gis_data/NGP/Raster/Predictor_vars_500/WGS/
 
 
-
-MAP.pres <- raster('NGP_MAP_00_19.tif'); plot(MAP.pres)
-MAP.hist <- raster('NGP_MAP_80_99.tif'); plot(MAP.hist)
+# Spring
+MAP.pres <- raster('MAP_00_19_WGS.tif'); MAP.pres
+MAP.hist <- raster('MAP_hist_WGS.tif'); MAP.hist
 MAP.change <- (MAP.pres - MAP.hist)
-# MAP.pchange <- ((MAP.pres - MAP.hist)/MAP.hist * 100) %>% projectRaster(crs = crs(ngp.wgs), method = 'bilinear')
+MAP.pchange <- ((MAP.pres - MAP.hist)/MAP.hist * 100)
 
-writeRaster(MAP.change, 'NGP_MAP_change_ttl.tif', overwrite = T)
-# writeRaster(MAP.pchange, 'NGP_MAP_change_pct.tif', overwrite = T)
-
-
-# grow.pres <- raster('NGP_GrowPr_00_18.tif'); plot(grow.pres)
-# grow.hist <- raster('NGP_GrowPr_80_99.tif'); plot(grow.hist)
-# grow.change <- (grow.pres - grow.hist) %>% projectRaster(crs = crs(ngp.wgs), method = 'bilinear')
-# grow.pchange <- ((grow.pres - grow.hist)/grow.hist * 100) %>% projectRaster(crs = crs(ngp.wgs), method = 'bilinear')
-# 
-# writeRaster(grow.change, 'NGP_GrowPr_change_ttl.tif', overwrite = T)
-# writeRaster(grow.pchange, 'NGP_GrowPr_change_pct.tif', overwrite = T)
+writeRaster(MAP.change, 'NGP_MAP_diff_WGS.tif', overwrite = T)
+writeRaster(MAP.pchange, 'NGP_MAP_pdiff_WGS.tif', overwrite = T)
 
 
-summer.pres <- raster('NGP_SummerPr_00_19.tif'); plot(summer.pres)
-summer.hist <- raster('NGP_SummerPr_80_99.tif'); plot(summer.hist)
+# Summer
+summer.pres <- raster('SummerPr_00_19_WGS.tif'); summer.pres
+summer.hist <- raster('SummerPr_hist_WGS.tif'); summer.hist
 summer.change <- (summer.pres - summer.hist) 
-# summer.pchange <- ((summer.pres - summer.hist)/summer.hist * 100) %>% projectRaster(crs = crs(ngp.wgs), method = 'bilinear')
+# summer.pchange <- ((summer.pres - summer.hist)/summer.hist * 100)
 
-writeRaster(summer.change, 'NGP_SummerPr_change_ttl.tif', overwrite = T)
+writeRaster(summer.change, 'NGP_SummerPr_diff_WGS.tif', overwrite = T)
 # writeRaster(summer.pchange, 'NGP_SummerPr_change_pct.tif', overwrite = T)
 
 
-spring.pres <- raster('NGP_SpringPr_00_19.tif'); plot(spring.pres)
-spring.hist <- raster('NGP_SpringPr_80_99.tif'); plot(spring.hist)
+spring.pres <- raster('SpringPr_00_19_WGS.tif'); spring.pres
+spring.hist <- raster('SpringPr_hist_WGS.tif'); spring.hist
 spring.change <- (spring.pres - spring.hist)
-# spring.pchange <- ((spring.pres - spring.hist)/spring.hist * 100) %>% projectRaster(crs = crs(ngp.wgs), method = 'bilinear')
+# spring.pchange <- ((spring.pres - spring.hist)/spring.hist * 100)
 
-writeRaster(spring.change, 'NGP_SpringPr_change_ttl.tif', overwrite = T)
+writeRaster(spring.change, 'NGP_SpringPr_diff_WGS.tif', overwrite = T)
 # writeRaster(spring.pchange, 'NGP_SpringPr_change_pct.tif', overwrite = T)
 
 
-winter.pres <- raster('NGP_WinterPr_00_19.tif'); plot(winter.pres)
-winter.hist <- raster('NGP_WinterPr_80_99.tif'); plot(winter.hist)
+winter.pres <- raster('WinterPr_00_19_WGS.tif'); winter.pres
+winter.hist <- raster('WinterPr_hist_WGS.tif'); winter.hist
 winter.change <- (winter.pres - winter.hist)
-# winter.pchange <- ((winter.pres - winter.hist)/winter.hist * 100) %>% projectRaster(crs = crs(ngp.wgs), method = 'bilinear') 
+# winter.pchange <- ((winter.pres - winter.hist)/winter.hist * 100)
 
-writeRaster(winter.change, 'NGP_WinterPr_change_ttl.tif', overwrite = T)
+writeRaster(winter.change, 'NGP_WinterPr_diff_WGS.tif', overwrite = T)
 # writeRaster(winter.pchange, 'NGP_WinterPr_change_pct.tif', overwrite = T)
 

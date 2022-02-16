@@ -11,6 +11,7 @@ and S7)
 
 2. RF_importance_figure_effectsize.R
 # Creates importance plots with z-scored effect sizes (Figures 3, 5 and S6)
+# Also conducts the Spearman's rank correlation analysis.
 
 3. boruta_analysis.R
 # Boruta variable selection algorithm

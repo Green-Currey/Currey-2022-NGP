@@ -2,12 +2,11 @@
 
 
 source('~/R/startup.R') 
-#c:/users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Raster/
+#z:/gis_data/NGP/raster/predictor_vars_500/wgs
 
 ngp <- readOGR(dsn = 'c:/users/bryce/onedrive/documents/Current Projects/NGP/2019_Veg_change/Data/Shapefile/ngp_boundary_WGS.shp')
-dem <- raster('c:/users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Raster/Predictor_vars_500/WGS/DEM_WGS_500.tif')
+dem <- raster('DEM_WGS_500.tif')
 
-# Convert to WGS 500 (same as state) ---------------------------------------
 
 # Climate -----------------------------------------------------------------
 
@@ -17,142 +16,49 @@ dem <- raster('c:/users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_c
                       ### TEMPERATURE VARIABLES ###
 
 
-MAT.daymet <- raster('NGP_MAT_00_19.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(MAT.daymet, 'Predictor_vars_500/WGS/MAT_daymet_WGS_500.tif', overwrite = T)
+mat <- raster('MAT_00_19_WGS.tif') 
+mat.hist <- raster('MAT_hist_WGS.tif') 
+mat.dif <- raster('NGP_MAT_diff_WGS.tif')
 
-raster('NGP_MAT_80_99.tif')%>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp) %>%
-  writeRaster('Predictor_vars_500/WGS/MAT_hist_WGS_500.tif', overwrite = T)
+temp.summer <- raster('SummerTemp_00_19_WGS.tif')
+temp.summer.hist <- raster('SummerTemp_hist_WGS.tif')
+temp.summer.dif <- raster('NGP_SummerTemp_diff_WGS.tif')
 
-MAT.change <- raster('NGP_MAT_change_ttl.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(MAT.change, 'Predictor_vars_500/WGS/MAT_dif_WGS_500.tif', overwrite = T)
+temp.winter <- raster('WinterTemp_00_19_WGS.tif') 
+temp.winter.hist <- raster('WinterTemp_hist_WGS.tif')
+temp.winter.dif <- raster('NGP_WinterTemp_diff_WGS.tif') 
 
-temp.summer <- raster('NGP_summerTemp_00_19.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(temp.summer, 'Predictor_vars_500/WGS/temp_summer_WGS_500.tif', overwrite = T)
+compareRaster(dem, mat, mat.dif, mat.hist,
+              temp.summer, temp.summer.dif, temp.summer.hist,
+              temp.winter, temp.winter.dif, temp.winter.hist)
 
-raster('NGP_summerTemp_80_99.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp) %>%
-  writeRaster('Predictor_vars_500/WGS/temp_summer_hist_WGS_500.tif', overwrite = T)
+                                  
 
-temp.summer.change <- raster('NGP_summerTemp_change_ttl.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(temp.summer.change, 'Predictor_vars_500/WGS/temp_summer_dif_WGS_500.tif', overwrite = T)
+                          ### PRECIPITATION VARIABLES ###
 
-temp.winter <- raster('NGP_winterTemp_00_19.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(temp.winter, 'Predictor_vars_500/WGS/temp_winter_WGS_500.tif', overwrite = T)
+map <- raster('MAP_00_19_WGS.tif')
+map.hist <- raster('MAP_hist_WGS.tif')
+map.dif <- raster('NGP_MAP_diff_WGS.tif')
 
-temp.winter.hist <- raster('NGP_winterTemp_80_99.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp) %>%
-  writeRaster('Predictor_vars_500/WGS/temp_winter_hist_WGS_500.tif', overwrite = T)
+pr.spring <- raster('SpringPr_00_19_WGS.tif') 
+pr.spring.hist <- raster('SpringPr_hist_WGS.tif')
+pr.spring.dif <- raster('NGP_SpringPr_diff_WGS.tif') 
 
-temp.winter.change <- raster('NGP_winterTemp_change_ttl.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(temp.winter.change, 'Predictor_vars_500/WGS/temp_winter_dif_WGS_500.tif', overwrite = T)
+pr.summer <- raster('SummerPr_00_19_WGS.tif') 
+pr.summer.hist <- raster('SummerPr_hist_WGS.tif')
+pr.summer.dif <- raster('NGP_SummerPr_diff_WGS.tif') 
 
+pr.winter <- raster('WinterPr_00_19_WGS.tif')
+pr.winter.hist <- raster('WinterPr_hist_WGS.tif')
+pr.winter.dif <- raster('NGP_WinterPr_diff_WGS.tif') 
 
+pr.cv <- raster('CV_WGS_500.tif') 
 
-                                  ### PRECIPITATION VARIABLES ###
-
-
-MAP.daymet <- raster('NGP_MAP_00_19.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(MAP.daymet, 'Predictor_vars_500/WGS/MAP_daymet_WGS_500.tif', overwrite = T)
-
-raster('NGP_MAP_00_19.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp) %>%
-  writeRaster('Predictor_vars_500/WGS/MAP_hist_WGS_500.tif', overwrite = T)
-
-MAP.change <- raster('NGP_MAP_change_ttl.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(MAP.change, 'Predictor_vars_500/WGS/MAP_dif_WGS_500.tif', overwrite = T)
-
-pr.spring <- raster('NGP_SpringPr_00_19.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(pr.spring, 'Predictor_vars_500/WGS/pr_spring_WGS_500.tif', overwrite = T)
-
-raster('NGP_SpringPr_80_99.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp) %>%
-  writeRaster('Predictor_vars_500/WGS/pr_spring_hist_WGS_500.tif', overwrite = T)
-
-pr.spring.change <- raster('NGP_SpringPr_change_ttl.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(pr.spring.change, 'Predictor_vars_500/WGS/pr_spring_dif_WGS_500.tif', overwrite = T)
-
-pr.summer <- raster('NGP_SummerPr_00_19.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(pr.summer, 'Predictor_vars_500/WGS/pr_summer_WGS_500.tif', overwrite = T)
-
-raster('NGP_SummerPr_80_99.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp) %>%
-  writeRaster('Predictor_vars_500/WGS/pr_summer_hist_WGS_500.tif', overwrite = T)
-
-pr.summer.change <- raster('NGP_SummerPr_change_ttl.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(pr.summer.change, 'Predictor_vars_500/WGS/pr_summer_dif_WGS_500.tif', overwrite = T)
-
-pr.winter <- raster('NGP_WinterPr_00_18.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(pr.winter, 'Predictor_vars_500/WGS/pr_winter_WGS_500.tif', overwrite = T)
-
-raster('NGP_WinterPr_80_99.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp) %>%
-  writeRaster('Predictor_vars_500/WGS/pr_winter_hist_WGS_500.tif', overwrite = T)
-
-pr.winter.change <- raster('NGP_WinterPr_change_ttl.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(pr.winter.change, 'Predictor_vars_500/WGS/pr_winter_dif_WGS_500.tif', overwrite = T)
-
-pr.cv <- raster('NGP_pr_CV.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(pr.cv, 'Predictor_vars_500/WGS/CV_WGS_500.tif', overwrite = T)
+compareRaster(dem, map, map.dif,
+              pr.spring, pr.spring.dif, pr.spring.hist, 
+              pr.summer, pr.summer.dif, pr.summer.hist, 
+              pr.winter, pr.winter.dif, pr.winter.hist,
+              pr.cv)
 
 
 
@@ -160,96 +66,22 @@ writeRaster(pr.cv, 'Predictor_vars_500/WGS/CV_WGS_500.tif', overwrite = T)
 
                               ### OTHER VARIABLES ###
 
-# DEM
-DEM <- raster('c:/users/bryce/Dropbox/NGP_veg_change_2019/Raster/Predictor_vars_500/WGS/DEM_WGS_500.tif') %>%
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(DEM, 'Predictor_vars_500/WGS/DEM_WGS_500.tif', overwrite = T)
-
 # roughness
-rough <- raster('c:/users/bryce/Dropbox/NGP_veg_change_2019/Raster/Predictor_vars_500/WGS/DEM_WGS_500.tif') %>%
-  terrain(opt = 'roughness') %>%
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(rough, 'Predictor_vars_500/WGS/rough_WGS_500.tif', overwrite = T)
+rough <- raster('rough_WGS_500.tif')
+asp <- raster('ASP_WGS_500.tif')
+slp <- raster('SLP_WGS_500.tif')
+soils <- raster('SOILS_WGS_500.tif')
+ndep <- raster('NDEP_WGS_500.tif') 
+grass <- raster('GRASS_WGS_500.tif') 
+burn <- raster('BURN_WGS_500.tif') 
+cow <- raster('COW_WGS_500.tif')
 
-# ASP
-ASP <- raster('c:/users/bryce/Dropbox/NGP_veg_change_2019/Raster/Predictor_vars_500/WGS/ASP_WGS_500.tif') %>%
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(ASP, 'Predictor_vars_500/WGS/ASP_WGS_500.tif', overwrite = T)
+agdd <- raster('AGDD_WGS_500.tif')
+agdd.hist <- raster('AGDD_hist_WGS_500.tif') 
+agdd.dif <- raster('AGDD_diff_WGS_500.tif')
 
-# SLP
-SLP <- raster('c:/users/bryce/Dropbox/NGP_veg_change_2019/Raster/Predictor_vars_500/WGS/SLP_WGS_500.tif') %>%
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(SLP, 'Predictor_vars_500/WGS/SLP_WGS_500.tif', overwrite = T)
-
-# Soils 
-soils <- raster('c:/users/bryce/Dropbox/NGP_veg_change_2019/Raster/NGP_soils_reclass.tif') %>%
-  projectRaster(dem, method = 'ngb') %>%
-  resample(dem, method = 'ngb') %>%
-  mask(ngp)
-writeRaster(soils, 'Predictor_vars_500/WGS/SOILS_WGS_500.tif', overwrite = T)
-
-
-# ndep
-ndep <- raster('d:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/NDEP_WGS_500.tif') %>%
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(ndep, 'Predictor_vars_500/WGS/NDEP_WGS_500.tif', overwrite = T)
-
-# veg
-veg <- raster('d:/GIS_data/NGP/Raster/Predictor_vars_500/WGS/VEG_WGS_500.tif') %>%
-  projectRaster(dem, method = 'ngb') %>%
-  resample(dem, method = 'ngb') %>%
-  mask(ngp)
-writeRaster(veg, 'Predictor_vars_500/WGS/VEG_WGS_500.tif', overwrite = T)
-
-# Fire PA
-burn <- raster('d:/GIS_data/NGP/Raster/Burn_data_MCD64A1/NGP_Burn.tif') %>%
-  projectRaster(dem, method = 'ngb') %>%
-  resample(dem, method = 'ngb') 
-burn[is.na(burn)] <- 0
-burn[burn>0] <- 1
-burn <- burn %>%
-  mask(ngp)
-writeRaster(burn, 'Predictor_vars_500/WGS/BURN_WGS_500.tif', overwrite = T)
-
-
-# Cattle from Gilbert et al
-cow <- raster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/Cattle_aw_Gilbert_NGP.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(cow, 'Predictor_vars_500/WGS/COW_WGS_500.tif', overwrite = T)
-
-# AGDD
-agdd <- raster('NGP_AGDD_00_18.tif') %>%
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(agdd, 'Predictor_vars_500/WGS/AGDD_WGS_500.tif', overwrite = T)
-
-# AGDD hist
-raster('NGP_AGDD_80_99.tif') %>%
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp) %>%
-writeRaster('Predictor_vars_500/WGS/AGDD_hist_WGS_500.tif', overwrite = T)
-
-
-# AGDD dif
-agdd.delta <- raster('c:/users/bryce/dropbox/NGP_veg_change_2019/Raster/NGP_AGDD_change_ttl.tif') %>%
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(agdd.delta, 'Predictor_vars_500/WGS/AGDD_diff_WGS_500.tif', overwrite = T)
+compareRaster(dem, rough, asp, slp, soils, ndep, grass, burn, cow, 
+              agdd, agdd.dif, agdd.hist)
 
 
 
@@ -257,101 +89,21 @@ writeRaster(agdd.delta, 'Predictor_vars_500/WGS/AGDD_diff_WGS_500.tif', overwrit
 
 
 # Tree cover change
-tc <- raster('d:/GIS_data/NGP/Raster/TreeCover_MOD44B_V006/tc_NGP_ppdiff_sig.tif') %>% 
-  projectRaster(dem, method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(tc, 'Predictor_vars_500/WGS/TC_WGS_500.tif', overwrite = T)
-
+tc <- raster('TC_WGS_500.tif')
 # tree cover year 2019
-tc2019 <- read_csv(file = 'd:/GIS_data/NGP/Raster/TreeCover_MOD44B_V006/TC_2000_2019.csv') %>%
-  dplyr::select(lon,lat, `2019`) %>% rasterFromXYZ(crs = crs(dem), method = 'ngb') %>%
-  resample(dem, method = 'ngb') %>%
-  mask(ngp)
-writeRaster(tc2019, 'Predictor_vars_500/WGS/TC2019_WGS_500.tif', overwrite = T)
-
+tc19 <- raster('TC2019_WGS_500.tif') 
 # tree cover year 2000
-tc2000 <- read_csv(file = 'd:/GIS_data/NGP/Raster/TreeCover_MOD44B_V006/TC_2000_2019.csv') %>%
-  dplyr::select(lon,lat, `2000`) %>% rasterFromXYZ(crs = crs(dem)) %>%
-  resample(dem, method = 'ngb') %>%
-  mask(ngp)
-writeRaster(tc2000, 'Predictor_vars_500/WGS/TC2000_WGS_500.tif', overwrite = T)
+tc00 <- raster('TC2000_WGS_500.tif') 
 
 # LAI
-lai <- raster('d:/GIS_data/NGP/Raster/LAI/lai_NGP_ppdiff_sig.tif') %>%
-  projectRaster(crs = crs(dem), method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(lai, 'Predictor_vars_500/WGS/LAI_WGS_500.tif', overwrite = T)
-
+lai <- raster('LAI_WGS_500.tif') 
 # max NDVI
-ndvi.max <- raster('d:/GIS_data/NGP/Raster/NDVI/peak_ndvi_NGP_ppdiff_sig.tif') %>%
-  projectRaster(crs = crs(dem), method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(ndvi.max, 'Predictor_vars_500/WGS/NDVI_WGS_500.tif', overwrite = T)
-
+ndvi <- raster('NDVI_WGS_500.tif') 
 # mean NDVI
-ndvi.mean <- raster('d:/GIS_data/NGP/Raster/NDVI/mean_ndvi_NGP_ppdiff_sig.tif') %>%
-  projectRaster(crs = crs(dem), method = 'bilinear') %>%
-  resample(dem) %>%
-  mask(ngp)
-writeRaster(ndvi.mean, 'Predictor_vars_500/WGS/mNDVI_WGS_500.tif', overwrite = T)
+mndvi <- raster('mNDVI_WGS_500.tif')
 
+compareRaster(dem, tc, tc00, tc19, lai, ndvi, mndvi)
 
-
-
-# WGS 500 Variables -------------------------------------------------------
-
-
-source('~/R/startup.R') 
-#c:/users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Raster/Predictor_vars_500/WGS/
-
-# state <- raster('STATE_WGS_500.tif'); dim(state)                                #  1
-
-mat.daymet <- raster('MAT_daymet_WGS_500.tif'); dim(mat.daymet)                   #  2
-mat.hist <- raster('MAT_hist_WGS_500.tif'); dim(mat.hist)                         #  2b
-mat.dif <- raster('MAT_dif_WGS_500.tif') ; dim(mat.dif)                           #  3
-temp.summer <- raster('temp_summer_WGS_500.tif'); dim(temp.summer)                #  4
-temp.summer.hist <- raster('temp_summer_hist_WGS_500.tif'); dim(temp.summer.hist) #  4b
-temp.summer.dif <- raster('temp_summer_dif_WGS_500.tif'); dim(temp.summer.dif)    #  5
-temp.winter <- raster('temp_winter_WGS_500.tif'); dim(temp.winter)                #  6
-temp.winter.hist <- raster('temp_winter_hist_WGS_500.tif'); dim(temp.winter.hist) #  6b
-temp.winter.dif <- raster('temp_winter_dif_WGS_500.tif'); dim(temp.winter.dif)    #  7
-
-map.daymet <- raster('MAP_daymet_WGS_500.tif'); dim(map.daymet)                   #  8
-map.hist <- raster('MAP_hist_WGS_500.tif'); dim(map.hist)                         #  8b
-map.dif <- raster('MAP_dif_WGS_500.tif'); dim(map.dif)                            #  9
-pr.spring <- raster('pr_spring_WGS_500.tif'); dim(pr.spring)                      # 10
-pr.spring.hist <- raster('pr_spring_hist_WGS_500.tif'); dim(pr.spring.hist)       # 10b
-pr.spring.dif <- raster('pr_spring_dif_WGS_500.tif'); dim(pr.spring.dif)          # 11
-pr.summer <- raster('pr_summer_WGS_500.tif'); dim(pr.summer)                      # 12
-pr.summer.hist <- raster('pr_summer_hist_WGS_500.tif'); dim(pr.summer.hist)       # 12b
-pr.summer.dif <- raster('pr_summer_dif_WGS_500.tif'); dim(pr.summer.dif)          # 13
-pr.winter <- raster('pr_winter_WGS_500.tif'); dim(pr.winter)                      # 14
-pr.winter.hist <- raster('pr_winter_hist_WGS_500.tif'); dim(pr.winter.hist)       # 14b
-pr.winter.dif <- raster('pr_winter_dif_WGS_500.tif'); dim(pr.winter.dif)          # 15
-
-lai <- raster('LAI_WGS_500.tif'); dim(lai)                                      # 16
-ndvi <- raster('NDVI_WGS_500.tif'); dim(ndvi)                                   # 17
-ndvi.m <- raster('mNDVI_WGS_500.tif'); dim(ndvi.m)                              # 18
-veg <- raster('VEG_WGS_500.tif'); dim(veg)                                      # 19
-tc <- raster('TC_WGS_500.tif'); dim(tc)                                         # 20
-tc19 <- raster('TC2019_WGS_500.tif'); dim(tc19)                                 # 21
-tc00 <- raster('TC2000_WGS_500.tif'); dim(tc00)                                 # 22
-
-asp <- raster('ASP_WGS_500.tif'); dim(asp)                                      # 23/24
-rough <- raster('ROUGH_WGS_500.tif'); dim(rough)                                # 25
-slp <- raster('SLP_WGS_500.tif'); dim(slp)                                      # 26
-elv <- raster('DEM_WGS_500.tif'); dim(elv)                                      # 27
-fire <- raster('BURN_WGS_500.tif'); dim(fire)                                   # 28
-soil <- raster('SOILS_WGS_500.tif'); dim(soil)                                  # 29
-cv <- raster('CV_WGS_500.tif'); dim(cv)                                         # 30
-ndep <- raster('NDEP_WGS_500.tif'); dim(ndep)                                   # 31
-agdd <- raster('AGDD_WGS_500.tif'); dim(agdd)                                   # 32
-agdd.hist <- raster('AGDD_hist_WGS_500.tif'); dim(agdd.hist)                    # 32b
-agdd.dif <- raster('AGDD_diff_WGS_500.tif'); dim(agdd.dif)                      # 33
-cow <- raster('COW_WGS_500.tif'); dim(cow)                                      # 34
 
 
 # aggregation into dataframe ----------------------------------------------
@@ -359,21 +111,20 @@ cow <- raster('COW_WGS_500.tif'); dim(cow)                                      
 # ALL data
 
 veg.change.data <- cbind(
-  # as.data.frame(state, xy = T),
-  as.data.frame(lai,xy = T),
+  as.data.frame(lai, xy = T),
   as.data.frame(ndvi),
-  as.data.frame(ndvi.m),
+  as.data.frame(mndvi),
   as.data.frame(tc),
   as.data.frame(tc19),
   as.data.frame(tc00),
   as.data.frame(sin(pi*asp/180)),
   as.data.frame(cos(pi*asp/180)),
   as.data.frame(slp),
-  as.data.frame(elv),
+  as.data.frame(dem),
   as.data.frame(rough),
-  as.data.frame(soil),
-  as.data.frame(veg),
-  as.data.frame(fire),
+  as.data.frame(soils),
+  as.data.frame(grass),
+  as.data.frame(burn),
   as.data.frame(pr.spring),
   as.data.frame(pr.spring.dif),
   as.data.frame(pr.summer),
@@ -388,9 +139,9 @@ veg.change.data <- cbind(
   as.data.frame(agdd),
   as.data.frame(agdd.dif),
   as.data.frame(cow),
-  as.data.frame(cv),
-  as.data.frame(map.daymet),
-  as.data.frame(mat.daymet),
+  as.data.frame(pr.cv),
+  as.data.frame(map),
+  as.data.frame(mat),
   as.data.frame(map.dif),
   as.data.frame(mat.dif)
 )
@@ -398,7 +149,7 @@ veg.change.data <- cbind(
 names(veg.change.data) <- c('x', 'y',
                   'lai', 'ndvi', 'ndvi_m', 'tc', 'tc19', 'tc00', 
                   'north', 'east', 'slp', 'elv', 'rough', 'soil',
-                  'veg', 'fire', 'pr_sp', 'pr_sp_dif', 'pr_su', 'pr_su_dif', 'pr_w', 'pr_w_dif',
+                  'grass', 'fire', 'pr_sp', 'pr_sp_dif', 'pr_su', 'pr_su_dif', 'pr_w', 'pr_w_dif',
                   'tmp_su', 'tmp_su_dif', 'tmp_w', 'tmp_w_dif', 'ndep', 
                   'agdd', 'agdd_dif', 'cow', 'cv', 'map_dm', 'mat_dm', 'map_dif', 'mat_dif')
 
@@ -408,16 +159,15 @@ str(veg.change.data)
 # For TC2000
 
 veg.change.data2 <- cbind(
-  # as.data.frame(state, xy = T),
   as.data.frame(tc00,xy=T),
   as.data.frame(sin(pi*asp/180)),
   as.data.frame(cos(pi*asp/180)),
   as.data.frame(slp),
-  as.data.frame(elv),
+  as.data.frame(dem),
   as.data.frame(rough),
-  as.data.frame(soil),
-  as.data.frame(veg),
-  as.data.frame(fire),
+  as.data.frame(soils),
+  as.data.frame(grass),
+  as.data.frame(burn),
   as.data.frame(pr.spring.hist),
   as.data.frame(pr.summer.hist),
   as.data.frame(pr.winter.hist),
@@ -426,7 +176,7 @@ veg.change.data2 <- cbind(
   as.data.frame(ndep),
   as.data.frame(agdd.hist),
   as.data.frame(cow),
-  as.data.frame(cv),
+  as.data.frame(pr.cv),
   as.data.frame(map.hist),
   as.data.frame(mat.hist)
 )
@@ -434,7 +184,7 @@ veg.change.data2 <- cbind(
 names(veg.change.data2) <- c('x', 'y',
                             'tc00', 
                             'north', 'east', 'slp', 'elv', 'rough', 'soil',
-                            'veg', 'fire', 'pr_sp', 'pr_su', 'pr_w',
+                            'grass', 'fire', 'pr_sp', 'pr_su', 'pr_w',
                             'tmp_su', 'tmp_w', 'ndep', 
                             'agdd', 'cow', 'cv', 'map', 'mat')
 
@@ -446,8 +196,8 @@ str(veg.change.data2)
 # factors
 
 veg.change.data.fin <- veg.change.data %>%
-  mutate(veg = factor(veg,
-                         labels = c('Needleleaf', 'Deciduous', 'Mixed', 'Shrub', 'Grass', 'Crop', 'Other'))) %>%
+  mutate(grass = factor(grass,
+                         labels = c('Other', 'Grass'))) %>%
   mutate(fire = factor(fire>0, 
                           labels = c('UB', 'Burn'))) %>%
   mutate(soil = factor(round(soil),
@@ -457,8 +207,8 @@ str(veg.change.data.fin)
 
 
 veg.change.data2.fin <- veg.change.data2 %>%
-  mutate(veg = factor(veg,
-                      labels = c('Needleleaf', 'Deciduous', 'Mixed', 'Shrub', 'Grass', 'Crop', 'Other'))) %>%
+  mutate(grass = factor(grass,
+                        labels = c('Other', 'Grass'))) %>%
   mutate(fire = factor(fire>0, 
                        labels = c('UB', 'Burn'))) %>%
   mutate(soil = factor(round(soil),
@@ -467,13 +217,13 @@ veg.change.data2.fin <- veg.change.data2 %>%
 str(veg.change.data2.fin)
 
 
-fwrite(veg.change.data.fin, 'c:/Users/bryce/OneDrive/Documents/NGP/Current Projects/2019_Veg_change/Data/Veg_change_data.csv')
+fwrite(veg.change.data.fin, 'c:/Users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Veg_change_data.csv')
 fwrite(veg.change.data2.fin, 'c:/Users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Veg_change_data2.csv')
 
-grass.change.data <- veg.change.data.fin %>% filter(veg == 'Grass' | veg == 'Shrub')
+grass.change.data <- veg.change.data.fin %>% filter(grass == 'Grass')
 write_csv(grass.change.data, 'c:/Users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Grass_change_data.csv')
 
-grass.change.data2 <- veg.change.data2.fin %>% filter(veg == 'Grass' | veg == 'Shrub')
+grass.change.data2 <- veg.change.data2.fin %>% filter(grass == 'Grass')
 write_csv(grass.change.data2, 'c:/Users/bryce/OneDrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Grass_change_data2.csv')
 
 
