@@ -12,6 +12,7 @@ library(randomForest)
 library(dplyr)
 library(doParallel)
 library(caret)
+library(data.table)
 
 cores <- detectCores()
 cl <- makePSOCKcluster(cores)
@@ -32,7 +33,7 @@ print(getDoParWorkers())
 # All analyses 		->	 run = 'all
 # --------------------------------------------
 
-run <- 2
+run <- 'green'
 st <- Sys.time() # obtain start time
 
 
@@ -46,8 +47,8 @@ st <- Sys.time() # obtain start time
 
 # tc change
 if (run == 1 | run == 'tc' | run == 'all') {
-        tc <- read.csv('/mnt/lustrefs/scratch/bryce.currey/NGP_veg_change/Grass_change_data.csv') %>%
-                select(-c(x, y, lai, ndvi, ndvi_m, tc00, tc19, north, east, veg)) %>%
+        tc <- fread('c:/users/bryce/onedrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Grass_change_data.csv') %>%
+                select(-c(x, y, lai, ndvi, ndvi_m, tc00, tc19, north, east, grass)) %>%
                 mutate(soil = factor(soil), fire = factor(fire)) %>%
                 na.exclude
         
@@ -58,8 +59,8 @@ if (run == 1 | run == 'tc' | run == 'all') {
 
 # tc 2000
 if (run == 2 | run == 'tc' | run == 'all') {
-        tc00 <- read.csv('/mnt/lustrefs/scratch/bryce.currey/NGP_veg_change/Grass_change_data2.csv') %>%
-                select(-c(x, y, lai, ndvi, ndvi_m, tc, tc19, north, east, veg)) %>%
+        tc00 <- fread('c:/users/bryce/onedrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Grass_change_data2.csv') %>%
+                select(-c(x, y, north, east, grass)) %>%
                 mutate(soil = factor(soil), fire = factor(fire)) %>%
                 na.exclude
         
@@ -70,8 +71,8 @@ if (run == 2 | run == 'tc' | run == 'all') {
 
 # tc 2019
 if (run == 3 | run == 'tc' | run == 'all') {
-        tc19 <- read.csv('/mnt/lustrefs/scratch/bryce.currey/NGP_veg_change/Grass_change_data.csv') %>%
-                select(-c(x, y, lai, ndvi, ndvi_m, tc, tc00, north, east, veg)) %>%
+        tc19 <- fread('c:/users/bryce/onedrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Grass_change_data.csv') %>%
+                select(-c(x, y, lai, ndvi, ndvi_m, tc, tc00, north, east, grass)) %>%
                 mutate(soil = factor(soil), fire = factor(fire)) %>%
                 na.exclude
         
@@ -85,8 +86,8 @@ if (run == 3 | run == 'tc' | run == 'all') {
 
 # lai
 if (run == 4 | run == 'green' | run == 'all') {
-        lai <- read.csv('/mnt/lustrefs/scratch/bryce.currey/NGP_veg_change/Grass_change_data.csv') %>%
-                select(-c(x, y, ndvi, ndvi_m, tc, tc00, tc19, north, east, veg)) %>%
+        lai <- fread('c:/users/bryce/onedrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Grass_change_data.csv') %>%
+                select(-c(x, y, ndvi, ndvi_m, tc, tc00, tc19, north, east, grass)) %>%
                 mutate(soil = factor(soil), fire = factor(fire)) %>%
                 na.exclude
         
@@ -97,8 +98,8 @@ if (run == 4 | run == 'green' | run == 'all') {
 
 # peak NDVI
 if (run == 5 | run == 'green' | run == 'all'){
-        pndvi <- read.csv('/mnt/lustrefs/scratch/bryce.currey/NGP_veg_change/Grass_change_data.csv') %>%
-                select(-c(x, y, lai, ndvi_m, tc, tc00, tc19, north, east, veg)) %>%
+        pndvi <- fread('c:/users/bryce/onedrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Grass_change_data.csv') %>%
+                select(-c(x, y, lai, ndvi_m, tc, tc00, tc19, north, east, grass)) %>%
                 mutate(soil = factor(soil), fire = factor(fire)) %>%
                 na.exclude
         
@@ -109,8 +110,8 @@ if (run == 5 | run == 'green' | run == 'all'){
 
 # mean NDVI
 if (run == 6 | run == 'green' | run == 'all'){
-        mndvi <- read.csv('/mnt/lustrefs/scratch/bryce.currey/NGP_veg_change/Grass_change_data.csv') %>%
-                select(-c(x, y, ndvi, lai, tc, tc00, tc19, north, east, veg)) %>%
+        mndvi <- fread('c:/users/bryce/onedrive/Documents/Current Projects/NGP/2019_Veg_change/Data/Grass_change_data.csv') %>%
+                select(-c(x, y, ndvi, lai, tc, tc00, tc19, north, east, grass)) %>%
                 mutate(soil = factor(soil), fire = factor(fire)) %>%
                 na.exclude
         
@@ -139,11 +140,17 @@ if (run == 1 | run == 'tc' | run == 'all') {
                               importance = T,
                               ntree = 500)
         
-        saveRDS(tc.rf, '~/NGP_veg_change/RFE/tc_rf_grass_classification.rds')
+        saveRDS(tc.rf, '~/Current Projects/NGP/2019_Veg_change/Data/RDS/tc_rf_grass_classification.rds')
         print('Random forest created and rds writen for tree cover change')
         print(Sys.time()-new.st)
         
 }
+samp <- sample(seq(nrow(tc)), 1000)
+tc.train <- tc[samp,]
+tc.cv1 <- rfcv(tc.train[,-1], factor(tc.train$tc>0), cv.fold = 5)
+itc.cv2 <- caret::train(y = factor(tc.train$tc > 0),
+                       x = tc.train[,-1],
+                       metric = 'Accuracy')
 
 # tc 2000
 if (run == 2 | run == 'tc' | run == 'all') {
@@ -152,7 +159,7 @@ if (run == 2 | run == 'tc' | run == 'all') {
                               importance = T,
                               ntree = 500)
         
-        saveRDS(tc00.rf, '~/NGP_veg_change/RFE/tc00_rf_grass_classification.rds')
+        saveRDS(tc00.rf, '~/Current Projects/NGP/2019_Veg_change/Data/RDS/tc00_rf_grass_classification.rds')
         print('Random forest created and rds writen for 2000 tree cover')
         print(Sys.time()-new.st)
         
@@ -165,7 +172,7 @@ if (run == 3 | run == 'tc' | run == 'all') {
                               importance = T,
                               ntree = 500)
         
-        saveRDS(tc19.rf, '~/NGP_veg_change/RFE/tc19_rf_grass_classification.rds')
+        saveRDS(tc19.rf, '~/Current Projects/NGP/2019_Veg_change/Data/RDS/tc19_rf_grass_classification.rds')
         print('Random forest created and rds writen for 2019 tree cover')
         print(Sys.time()-new.st)
         
@@ -180,7 +187,7 @@ if (run == 4 | run == 'green' | run == 'all') {
                                importance = T,
                                ntree = 500)
         
-        saveRDS(lai.rf, '~/NGP_veg_change/RFE/lai_rf_grass_classification.rds')
+        saveRDS(lai.rf, '~/Current Projects/NGP/2019_Veg_change/Data/RDS/lai_rf_grass_classification.rds')
         print('Random forest created and rds writen for lai change')
         print(Sys.time()-new.st)
         
@@ -193,7 +200,7 @@ if (run == 5 | run == 'green' | run == 'all'){
                                  importance = T,
                                  ntree = 500)
         
-        saveRDS(pndvi.rf, '~/NGP_veg_change/RFE/pndvi_rf_grass_classification.rds')
+        saveRDS(pndvi.rf, '~/Current Projects/NGP/2019_Veg_change/Data/RDS/pndvi_rf_grass_classification.rds')
         print('Random forest created and rds writen for peak ndvi change')
         print(Sys.time()-new.st)
         
@@ -207,7 +214,7 @@ if (run == 6 | run == 'green' | run == 'all'){
                                  importance = T,
                                  ntree = 500)
         
-        saveRDS(mndvi.rf, '~/NGP_veg_change/RFE/mndvi_rf_grass_classification.rds')
+        saveRDS(mndvi.rf, '~/Current Projects/NGP/2019_Veg_change/Data/RDS/mndvi_rf_grass_classification.rds')
         print('Random forest created and rds writen for mean ndvi change')
         print(Sys.time()-new.st)
         
